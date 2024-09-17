@@ -7,7 +7,7 @@ dotenv.config();
 const app: Application = express();
 const port = process.env.PORT || 8000;
 
-app.get("/", async (req: Request, res: Response) => {
+app.get("/launches", async (req: Request, res: Response) => {
   try {
     const launches = await launchesService.getLaunches();
     res.status(200).send([...launches]);
