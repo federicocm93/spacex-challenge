@@ -14,8 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const launches_service_1 = require("./services/launches.service");
 dotenv_1.default.config();
+const launches_service_1 = require("./services/launches.service");
+const notFound_error_1 = require("./errors/notFound.error");
 const app = (0, express_1.default)();
 const port = process.env.PORT || 8000;
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -27,8 +28,19 @@ app.get("/launches", (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(200).send([...launches]);
     }
     catch (error) {
-        console.log(error);
-        res.status(500).send("An error ocurred");
+        if (error instanceof notFound_error_1.NotFoundError) {
+            res.status(404).send({
+                error: error.message,
+            });
+        }
+        else if (error instanceof Error) {
+            res.status(500).send({
+                error: error.message,
+            });
+        }
+        else {
+            res.status(500).send("An unknown error ocurred");
+        }
     }
 }));
 app.listen(port, () => {

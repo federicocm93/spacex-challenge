@@ -1,8 +1,8 @@
 import express, { Request, Response, Application } from "express";
 import dotenv from "dotenv";
-import { launchesService } from "./services/launches.service";
-
 dotenv.config();
+import { launchesService } from "./services/launches.service";
+import { NotFoundError } from "./errors/notFound.error";
 
 const app: Application = express();
 const port = process.env.PORT || 8000;
@@ -16,8 +16,17 @@ app.get("/launches", async (req: Request, res: Response) => {
     const launches = await launchesService.getLaunches();
     res.status(200).send([...launches]);
   } catch (error) {
-    console.log(error);
-    res.status(500).send("An error ocurred");
+    if (error instanceof NotFoundError) {
+      res.status(404).send({
+        error: error.message,
+      });
+    } else if (error instanceof Error) {
+      res.status(500).send({
+        error: error.message,
+      });
+    } else {
+      res.status(500).send("An unknown error ocurred");
+    }
   }
 });
 

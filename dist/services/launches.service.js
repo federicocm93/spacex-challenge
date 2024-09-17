@@ -10,27 +10,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.launchesService = void 0;
+const notFound_error_1 = require("../errors/notFound.error");
 const spacex_service_1 = require("./external/spacex.service");
 exports.launchesService = {
     getLaunches() {
         return __awaiter(this, void 0, void 0, function* () {
             const spaceXLaunches = yield spacex_service_1.spaceXService.getLaunches();
             const spaceXRockets = yield spacex_service_1.spaceXService.getRockets();
+            // Get a Map with rocket_id as key and the needed info from the rocket as value
+            const spaceXRocketsIndexed = getRocketsInfoIndexed(spaceXRockets);
             let launches = [];
             if (!spaceXLaunches.length) {
-                throw new Error("SpaceX launches not found.");
+                throw new notFound_error_1.NotFoundError("SpaceX launches not found.");
             }
             launches = spaceXLaunches.map((launch) => {
-                const rocket = spaceXRockets.find((rocket) => rocket.rocket_id == launch.rocket.rocket_id);
+                // Get corresponding rocket from map
+                const rocket = spaceXRocketsIndexed.get(launch.rocket.rocket_id);
                 return {
                     flight_number: launch.flight_number,
                     mission_name: launch.mission_name,
-                    rocket: {
-                        rocket_id: rocket.rocket_id,
-                        rocket_name: rocket.rocket_name,
-                        description: rocket.description,
-                        images: rocket.flickr_images,
-                    },
+                    rocket: rocket,
                     payloads: getLaunchPayloads(launch),
                 };
             });
@@ -51,4 +50,17 @@ const getLaunchPayloads = (launch) => {
         });
     }
     return payloads;
+};
+const getRocketsInfoIndexed = (rockets) => {
+    let rocketsIndexedMap = new Map();
+    rockets.map((rocket) => {
+        const parsedRocket = {
+            rocket_id: rocket.rocket_id,
+            rocket_name: rocket.rocket_name,
+            description: rocket.description,
+            images: rocket.flickr_images,
+        };
+        rocketsIndexedMap.set(rocket.rocket_id, parsedRocket);
+    });
+    return rocketsIndexedMap;
 };
