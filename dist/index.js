@@ -18,6 +18,9 @@ const launches_service_1 = require("./services/launches.service");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 8000;
+app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.status(200).send("Welcome to Cliengo's SpaceX Challenge!");
+}));
 app.get("/launches", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const launches = yield launches_service_1.launchesService.getLaunches();
