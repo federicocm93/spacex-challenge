@@ -24,14 +24,19 @@ interface Launch {
 export const launchesService = {
   async getLaunches(): Promise<Launch[]> {
     const spaceXLaunches = await spaceXService.getLaunches();
+    if (!spaceXLaunches.length) {
+      throw new NotFoundError("SpaceX launches not found.");
+    }
+
     const spaceXRockets = await spaceXService.getRockets();
+    if (!spaceXRockets.length) {
+      throw new NotFoundError("SpaceX rockets not found.");
+    }
     // Get a Map with rocket_id as key and the needed info from the rocket as value
     const spaceXRocketsIndexed: Map<string, Rocket> = getRocketsInfoIndexed(spaceXRockets);
 
     let launches: Launch[] = [];
-    if (!spaceXLaunches.length) {
-      throw new NotFoundError("SpaceX launches not found.");
-    }
+
     launches = spaceXLaunches.map((launch: any) => {
       // Get corresponding rocket from map
       const rocket = spaceXRocketsIndexed.get(launch.rocket.rocket_id);

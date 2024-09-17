@@ -16,13 +16,16 @@ exports.launchesService = {
     getLaunches() {
         return __awaiter(this, void 0, void 0, function* () {
             const spaceXLaunches = yield spacex_service_1.spaceXService.getLaunches();
-            const spaceXRockets = yield spacex_service_1.spaceXService.getRockets();
-            // Get a Map with rocket_id as key and the needed info from the rocket as value
-            const spaceXRocketsIndexed = getRocketsInfoIndexed(spaceXRockets);
-            let launches = [];
             if (!spaceXLaunches.length) {
                 throw new notFound_error_1.NotFoundError("SpaceX launches not found.");
             }
+            const spaceXRockets = yield spacex_service_1.spaceXService.getRockets();
+            if (!spaceXRockets.length) {
+                throw new notFound_error_1.NotFoundError("SpaceX rockets not found.");
+            }
+            // Get a Map with rocket_id as key and the needed info from the rocket as value
+            const spaceXRocketsIndexed = getRocketsInfoIndexed(spaceXRockets);
+            let launches = [];
             launches = spaceXLaunches.map((launch) => {
                 // Get corresponding rocket from map
                 const rocket = spaceXRocketsIndexed.get(launch.rocket.rocket_id);
