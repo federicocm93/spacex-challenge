@@ -47,8 +47,8 @@ export const launchesService = {
   },
 };
 
-const getLaunchPayloads = (launch: any) => {
-  let payloads: any[] = [];
+const getLaunchPayloads = (launch: any): Payload[] => {
+  let payloads: Payload[] = [];
   if (launch.rocket?.second_stage?.payloads) {
     payloads = launch.rocket?.second_stage?.payloads.map((payload: any) => {
       return {
